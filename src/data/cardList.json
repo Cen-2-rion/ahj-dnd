@@ -1,0 +1,14 @@
+{
+  "todo": [
+    "Welcome to Trello!"
+  ],
+  "inprogress": [
+    "This is a card in progress.",
+    "Drag and drop cards to change their status."
+  ],
+  "done": [
+    "This is a card that's done.",
+    "Want updates on new features?",
+    "Check the 'Done' tab."
+  ]
+}
