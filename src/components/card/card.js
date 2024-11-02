@@ -14,14 +14,14 @@ export default class Card {
     const cardText = document.createElement("p");
     cardText.classList.add("card-text");
     cardText.textContent = this.text;
-    card.appendChild(cardText);
+    card.append(cardText);
 
     // добавляем элемент крестика
     const cardCloseButton = document.createElement("button");
     cardCloseButton.classList.add("card-close-button", "hidden");
     cardCloseButton.type = "button";
     cardCloseButton.innerHTML = "&times";
-    card.appendChild(cardCloseButton);
+    card.append(cardCloseButton);
 
     return card;
   }

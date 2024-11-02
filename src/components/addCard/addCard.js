@@ -1,5 +1,4 @@
 import "./addCard.css";
-import Card from "../card/card";
 
 export default class AddCard {
   constructor(parent) {
@@ -15,7 +14,7 @@ export default class AddCard {
     const cardInput = document.createElement("textarea");
     cardInput.classList.add("card-text-input", "hidden");
     cardInput.placeholder = "Enter a title for this card...";
-    form.appendChild(cardInput);
+    form.append(cardInput);
 
     // кнопки "Add card" и "Cancel", оборачиваем их в отдельный тег
     const cardButtons = document.createElement("div");
@@ -25,22 +24,22 @@ export default class AddCard {
     addCardButton.classList.add("add-card-button", "hidden");
     addCardButton.type = "button";
     addCardButton.textContent = "Add Card";
-    cardButtons.appendChild(addCardButton);
+    cardButtons.append(addCardButton);
 
     const cancelCardButton = document.createElement("button");
     cancelCardButton.classList.add("cancel-card-button", "hidden");
     cancelCardButton.type = "button";
     cancelCardButton.innerHTML = "&times";
-    cardButtons.appendChild(cancelCardButton);
+    cardButtons.append(cancelCardButton);
 
-    form.appendChild(cardButtons);
+    form.append(cardButtons);
 
     // кнопка "Add another card"
     const addAnotherCardButton = document.createElement("button");
     addAnotherCardButton.classList.add("add-another-card-button");
     addAnotherCardButton.type = "button";
     addAnotherCardButton.textContent = "Add another card";
-    form.appendChild(addAnotherCardButton);
+    form.append(addAnotherCardButton);
 
     return form;
   }
@@ -62,7 +61,7 @@ export default class AddCard {
     cancelCardButton.classList.remove("hidden");
   }
 
-  static cancelInput(parent) {
+  static hideInput(parent) {
     // скрываем кнопки "Add card" и "Cancel" и отображаем кнопку "Add another card"
     const addAnotherCardButton = parent.querySelector(
       ".add-another-card-button",
@@ -71,20 +70,12 @@ export default class AddCard {
 
     const cardInput = parent.querySelector(".card-text-input");
     cardInput.classList.add("hidden");
+    cardInput.value = "";
 
     const addCardButton = parent.querySelector(".add-card-button");
     addCardButton.classList.add("hidden");
 
     const cancelCardButton = parent.querySelector(".cancel-card-button");
     cancelCardButton.classList.add("hidden");
-  }
-
-  static addInput(parent, text) {
-    // создаем новую карточку и добавляем ее в родительскую форму
-    const card = new Card(text).render();
-    parent.parentNode.insertBefore(card, parent);
-
-    card.addEventListener("mouseenter", Card.showCloseButton);
-    card.addEventListener("mouseleave", Card.hideCloseButton);
   }
 }

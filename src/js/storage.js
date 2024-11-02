@@ -1,4 +1,4 @@
-export default class BoardStorage {
+export default class Storage {
   static save(boardState) {
     localStorage.setItem("boardState", JSON.stringify(boardState));
   }

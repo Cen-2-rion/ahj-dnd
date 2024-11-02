@@ -14,7 +14,7 @@ export default class Column {
     const columnTitle = document.createElement("h2");
     columnTitle.classList.add("column-title");
     columnTitle.textContent = this.title;
-    column.appendChild(columnTitle);
+    column.append(columnTitle);
 
     return column;
   }
