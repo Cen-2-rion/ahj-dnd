@@ -151,12 +151,12 @@ class App {
   onMouseUp = (e) => {
     if (!this.draggedEl) return;
     
-    this.draggedEl.classList.add('hidden');
+    // показываем оригинал карточки
     this.actualEl.classList.remove('hidden');
     
     const columnNameBeforeInsert = this.actualEl.closest(".column").firstChild.textContent;
     const cardText = this.actualEl.querySelector(".card-text").textContent;
-    
+
     // вызываем метод для установки карточки в новую колонку
     this.insert(this.actualEl, e.clientX, e.clientY);
     
@@ -230,7 +230,9 @@ class App {
   }
 
   insert(element, x, y) {
-    if (!element) return;
+    if (!element.closest(".board")) return;
+
+    this.draggedEl.classList.remove("dragged");
 
     const target = document.elementFromPoint(x, y);
     const {top} = target.getBoundingClientRect();
@@ -238,14 +240,30 @@ class App {
     const column = target.closest(".column");
 
     if (!column) return;
-    
-    if (card) {
+
+    // перемещаем элемент по DOM-дереву
+    if (!card) {
+      const elem = card;
+      if (elem) {
+        column.insertBefore(element, elem.nextElementSibling);
+      } else {
+        const columnTitle = column.firstChild;
+        if (elem === columnTitle) {
+          column.insertBefore(element, columnTitle.nextElementSibling);
+        } else {
+          const form = column.lastChild;
+          column.insertBefore(element, form);
+        }
+      }
+    } else {
       if (y > window.scrollY + top + target.offsetHeight / 2) {
         column.insertBefore(element, card.nextElementSibling);
       } else {
         column.insertBefore(element, card);
       }
     }
+
+    this.draggedEl.classList.add("dragged");
   }
 }
 
