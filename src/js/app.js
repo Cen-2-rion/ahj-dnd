@@ -16,7 +16,8 @@ class App {
 
     this.actualEl = null;
     this.draggedEl = null;
-    
+    this.cloneEl = null;
+
     this.mousePosition = {};
 
     this.onMouseClick = this.onMouseClick.bind(this);
@@ -77,7 +78,7 @@ class App {
     let target = e.target;
 
     if (this.storage) {
-      this.boardState = BoardState.from(this.storage);            
+      this.boardState = BoardState.from(this.storage);
     }
 
     // удаляем текст карточки при клике на кнопку "Close"
@@ -108,9 +109,9 @@ class App {
     }
 
     if (this.storage) {
-      this.boardState = BoardState.from(this.storage);            
+      this.boardState = BoardState.from(this.storage);
     }
-    
+
     // добавляем новую карточку с текстом при клике на кнопку "Add card"
     if (target.classList.contains("add-card-button")) {
       const form = target.closest(".form");
@@ -138,32 +139,45 @@ class App {
         Storage.save(this.boardState);
       }
     }
-  }
+  };
 
   onMouseMove = (e) => {
-    if (!this.actualEl)  return;
+    if (!this.actualEl) return;
+
+    this.draggedEl.classList.add("hidden");
+
+    // перемещаем клон по DOM-дереву
+    this.insert(this.cloneEl, e.clientX, e.clientY);
+
+    this.draggedEl.classList.remove("hidden");
 
     // перемещаем карточку при нажатии и перемещении мыши
     this.draggedEl.style.left = e.clientX - this.mousePosition.x + "px";
     this.draggedEl.style.top = e.clientY - this.mousePosition.y + "px";
-  }
-  
+  };
+
   onMouseUp = (e) => {
     if (!this.draggedEl) return;
-    
-    // показываем оригинал карточки
-    this.actualEl.classList.remove('hidden');
-    
-    const columnNameBeforeInsert = this.actualEl.closest(".column").firstChild.textContent;
+
+    // удаляем элементы
+    this.draggedEl.remove();
+    this.cloneEl.remove();
+
+    // отображаем оригинал карточки
+    this.actualEl.classList.remove("hidden");
+
+    const columnNameBeforeInsert =
+      this.actualEl.closest(".column").firstChild.textContent;
     const cardText = this.actualEl.querySelector(".card-text").textContent;
 
     // вызываем метод для установки карточки в новую колонку
     this.insert(this.actualEl, e.clientX, e.clientY);
-    
-    const columnNameAfterInsert = this.actualEl.closest(".column").firstChild.textContent;
-    
+
+    const columnNameAfterInsert =
+      this.actualEl.closest(".column").firstChild.textContent;
+
     if (this.storage) {
-      this.boardState = BoardState.from(this.storage);            
+      this.boardState = BoardState.from(this.storage);
     }
 
     for (let key in boardList) {
@@ -176,7 +190,8 @@ class App {
       }
       // добавляем текст карточки в новую колонку после перемещения
       if (boardList[key] === columnNameAfterInsert) {
-        const nextEl = this.actualEl.nextElementSibling.querySelector(".card-text");
+        const nextEl =
+          this.actualEl.nextElementSibling.querySelector(".card-text");
         if (!nextEl) {
           this.boardState[key].push(cardText);
         } else {
@@ -191,18 +206,20 @@ class App {
     Storage.save(this.boardState);
 
     // очищаем ссылки
-    this.draggedEl.remove();
     this.draggedEl = null;
     this.actualEl = null;
+    this.cloneEl = null;
 
     // отменяем перехватывание событий нажатия и движения мыши
     document.documentElement.removeEventListener("mousemove", this.onMouseMove);
     document.documentElement.removeEventListener("mouseup", this.onMouseUp);
-  }
+  };
 
   onMouseDown = (e) => {
-    if (e.target.classList.contains("card") || e.target.classList.contains("card-text")) {
-
+    if (
+      e.target.classList.contains("card") ||
+      e.target.classList.contains("card-text")
+    ) {
       e.preventDefault();
 
       // находим карточку, на которую нажали и позицию мыши
@@ -220,22 +237,25 @@ class App {
       this.draggedEl.style.top = e.clientY - this.mousePosition.y + "px";
       this.draggedEl.style.width = this.actualEl.offsetWidth + "px";
 
+      this.cloneEl = this.actualEl.cloneNode(true);
+      this.cloneEl.classList.add("cloned");
+      this.actualEl.append(this.cloneEl);
+      this.cloneEl.style.visibility = "hidden";
+
       // скрываем оригинал карточки
-      this.actualEl.classList.add('hidden');
+      this.actualEl.classList.add("hidden");
 
       // перехватываем события нажатия и движения мыши
       document.documentElement.addEventListener("mousemove", this.onMouseMove);
       document.documentElement.addEventListener("mouseup", this.onMouseUp);
     }
-  }
+  };
 
   insert(element, x, y) {
     if (!element.closest(".board")) return;
 
-    this.draggedEl.classList.remove("dragged");
-
     const target = document.elementFromPoint(x, y);
-    const {top} = target.getBoundingClientRect();
+    const { top } = target.getBoundingClientRect();
     const card = target.closest(".card");
     const column = target.closest(".column");
 
@@ -243,17 +263,10 @@ class App {
 
     // перемещаем элемент по DOM-дереву
     if (!card) {
-      const elem = card;
-      if (elem) {
-        column.insertBefore(element, elem.nextElementSibling);
-      } else {
-        const columnTitle = column.firstChild;
-        if (elem === columnTitle) {
-          column.insertBefore(element, columnTitle.nextElementSibling);
-        } else {
-          const form = column.lastChild;
-          column.insertBefore(element, form);
-        }
+      const elem = document.elementFromPoint(x, y);
+      const cardEl = elem.querySelector(".card");
+      if (!cardEl) {
+        column.insertBefore(element, column.lastChild);
       }
     } else {
       if (y > window.scrollY + top + target.offsetHeight / 2) {
@@ -262,8 +275,6 @@ class App {
         column.insertBefore(element, card);
       }
     }
-
-    this.draggedEl.classList.add("dragged");
   }
 }
 
