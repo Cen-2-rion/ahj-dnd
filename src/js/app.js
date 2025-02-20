@@ -1,7 +1,7 @@
 import Board from "../components/board/board";
 import Column from "../components/column/column";
 import Card from "../components/card/card";
-import AddCard from "../components/addCard/addCard";
+import Form from "../components/form/form";
 
 import boardList from "../data/boardList.json";
 import cardList from "../data/cardList.json";
@@ -65,7 +65,7 @@ class App {
         card.addEventListener("mouseleave", Card.hideCloseButton);
       });
       // создаём форму добавления новой карточки
-      form = new AddCard(columns[key]).render();
+      form = new Form(columns[key]).render();
       columns[key].append(form);
 
       // сохраняем состояние в локальное хранилище
@@ -83,7 +83,9 @@ class App {
 
     // удаляем текст карточки при клике на кнопку "Close"
     if (target.classList.contains("card-close-button")) {
-      const columnName = target.closest(".column").firstChild.textContent;
+      const columnName = target
+        .closest(".column")
+        .querySelector(".column-title").textContent;
       const card = target.closest(".card");
       const cardText = card.querySelector(".card-text").textContent;
 
@@ -103,9 +105,9 @@ class App {
 
     // вызываем методы на кнопках "Add another card" и "Cancel"
     if (target.classList.contains("add-another-card-button")) {
-      AddCard.showInput(target.closest(".form"));
-    } else if (target.classList.contains("cancel-card-button")) {
-      AddCard.hideInput(target.closest(".form"));
+      Form.showInput(target.closest(".form"));
+    } else if (target.classList.contains("form-cancel-button")) {
+      Form.hideInput(target.closest(".form"));
     }
 
     if (this.storage) {
@@ -113,18 +115,20 @@ class App {
     }
 
     // добавляем новую карточку с текстом при клике на кнопку "Add card"
-    if (target.classList.contains("add-card-button")) {
+    if (target.classList.contains("form-add-button")) {
       const form = target.closest(".form");
-      const input = form.querySelector(".card-text-input");
+      const input = form.querySelector(".form-text-input");
       const text = input.value.trim();
 
-      const columnName = form.closest(".column").firstChild.textContent;
+      const columnName = target
+        .closest(".column")
+        .querySelector(".column-title").textContent;
 
       if (text) {
         const card = new Card(text).render();
         form.before(card);
         input.value = "";
-        AddCard.hideInput(form);
+        Form.hideInput(form);
 
         // добавляем текст текущей карточки в массив
         for (let key in boardList) {
@@ -166,15 +170,17 @@ class App {
     // отображаем оригинал карточки
     this.actualEl.classList.remove("hidden");
 
-    const columnNameBeforeInsert =
-      this.actualEl.closest(".column").firstChild.textContent;
+    const columnNameBeforeInsert = this.actualEl
+      .closest(".column")
+      .querySelector(".column-title").textContent;
     const cardText = this.actualEl.querySelector(".card-text").textContent;
 
     // вызываем метод для установки карточки в новую колонку
     this.insert(this.actualEl, e.clientX, e.clientY);
 
-    const columnNameAfterInsert =
-      this.actualEl.closest(".column").firstChild.textContent;
+    const columnNameAfterInsert = this.actualEl
+      .closest(".column")
+      .querySelector(".column-title").textContent;
 
     if (this.storage) {
       this.boardState = BoardState.from(this.storage);

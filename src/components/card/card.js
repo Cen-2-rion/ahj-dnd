@@ -10,18 +10,18 @@ export default class Card {
     const card = document.createElement("div");
     card.classList.add("card");
 
-    // добавляем текст
+    // текст карточки
     const cardText = document.createElement("p");
     cardText.classList.add("card-text");
     cardText.textContent = this.text;
-    card.append(cardText);
 
-    // добавляем элемент крестика
+    // элемент крестика
     const cardCloseButton = document.createElement("button");
     cardCloseButton.classList.add("card-close-button", "hidden");
     cardCloseButton.type = "button";
     cardCloseButton.innerHTML = "&times";
-    card.append(cardCloseButton);
+
+    card.append(cardText, cardCloseButton);
 
     return card;
   }
